@@ -6,8 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 #                                 check_reservation_before_edit)
 from app.core.db import get_async_session
 from app.core.user import current_superuser, current_user
-from app.crud.donation import donation_crud
+from app.crud import donation_crud
 from app.schemas.donation import DonationCreate, DonationDB, DonationBase
+from app.services.donation import donation_invested, donation_balance
 from app.models import User
 
 router = APIRouter()
@@ -17,25 +18,24 @@ router = APIRouter()
 async def create_donation(
         donation: DonationBase,
         session: AsyncSession = Depends(get_async_session),
-        user: User = Depends(current_user),
+        #user: User = Depends(current_user),
 ):
-    # await check_meeting_room_exists(
-    #     reservation.meetingroom_id, session
-    # )
-    # await check_reservation_intersections(
-    #     # Так как валидатор принимает **kwargs,
-    #     # аргументы должны быть переданы с указанием ключей.
-    #     **reservation.dict(), session=session
-    # )
-    new_donation = await donation_crud.create(
-        donation, session, user
-    )
+    #donation_amount = await donation_balance(donation.full_amount, session)
+    new_donation = await donation_crud.create(donation, session)
+    # await donation_invested(
+    #     new_donation,
+    #     donation_amount,
+    #     session)
+    # return new_donation
+
+    # new_donation = await donation_crud.create(
+    #     donation, session)  # , user)
     return new_donation
 
 
 @router.get('/',
             response_model=list[DonationDB],)
-           # dependencies=[Depends(current_superuser)],)
+           # dependencies=[Depends(current_user)],)
 async def get_all_new_donations(
         session: AsyncSession = Depends(get_async_session)
 ):

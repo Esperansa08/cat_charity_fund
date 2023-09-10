@@ -12,7 +12,7 @@ from app.models import Donation, User
 
 class CRUDDonation(CRUDBase):
 
-    async def get_reservations_at_the_same_time(
+    async def get_donations_at_the_same_time(
             self,
             *,
             from_reserve: datetime,
@@ -20,7 +20,7 @@ class CRUDDonation(CRUDBase):
             meetingroom_id: int,
             reservation_id: Optional[int] = None,
             session: AsyncSession,
-    ) : #-> list[Reservation]:
+    ):  # -> list[Reservation]:
         pass
     #     select_stmt = select(Reservation).where(
     #         Reservation.meetingroom_id == meetingroom_id,

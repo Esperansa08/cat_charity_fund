@@ -1,6 +1,10 @@
 #from typing import Optional
-from datetime import datetime
-from pydantic import BaseModel, Field, PositiveInt  # validator,
+from datetime import datetime, timedelta as td
+from pydantic import BaseModel, Field, PositiveInt, Extra  # validator,
+
+
+CREATE_DATE = (datetime.now() + td(minutes=10)).isoformat(timespec='minutes')
+CLOSE_DATE = (datetime.now() + td(days=10)).isoformat(timespec='minutes')
 
 
 class CharityProjectCreate(BaseModel):
@@ -12,12 +16,13 @@ class CharityProjectCreate(BaseModel):
 class CharityProjectDB(CharityProjectCreate):
     id: int
     invested_amount: int
-    fully_invested: bool
-    create_date: datetime
-    close_date: datetime
+    fully_invested: bool = Field(default=False)
+    create_date: datetime = Field(datetime.now(), example=CREATE_DATE)
+    close_date: datetime = Field(None, example=CLOSE_DATE)
 
     class Config:
         orm_mode = True
+        extra = Extra.forbid
 
 
 class CharityProjectUpdate(CharityProjectDB):

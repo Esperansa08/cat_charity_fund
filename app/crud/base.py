@@ -38,9 +38,7 @@ class CRUDBase:
             user: Optional[User] = None
     ):
         obj_in_data = obj_in.dict()
-        # Если пользователь был передан...
         if user is not None:
-            # ...то дополнить словарь для создания модели.
             obj_in_data['user_id'] = user.id
         db_obj = self.model(**obj_in_data)
         session.add(db_obj)
