@@ -39,20 +39,5 @@ class CRUDDonation(CRUDBase):
     #     reservations = reservations.scalars().all()
     #     return reservations
 
-    # async def get_future_reservations_for_room(
-    #         self,
-    #         room_id: int,
-    #         session: AsyncSession) -> list[Reservation]:
-    #     reservations = await session.execute(select(Reservation).where(
-    #         Reservation.meetingroom_id == room_id,
-    #         Reservation.to_reserve > datetime.now()))
-    #     reservations = reservations.scalars().all()
-    #     return reservations
-
-    # async def get_by_user(self, session: AsyncSession, user: User):
-    #     reservations = await session.execute(select(Reservation).where(
-    #         Reservation.user_id == user.id))
-    #     return reservations.scalars().all()
-
 
 donation_crud = CRUDDonation(Donation)

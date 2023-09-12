@@ -29,13 +29,11 @@ async def create_new_charity_project(
 ):
     """Только для суперюзеров."""
     await check_name_duplicate(charity_project.name, session)
-    # invested_amount = await charity_project_balance(
-    #     charity_project.full_amount, session)
+    invested_amount = await charity_project_balance(
+        charity_project.full_amount, session)
     new_charity_project = await charity_project_crud.create(charity_project, session)
-    # await charity_project_invested(
-    #     new_charity_project,
-    #     invested_amount,
-    #     session)
+    await charity_project_invested(new_charity_project, invested_amount,
+                                   session)
     return new_charity_project
 
 

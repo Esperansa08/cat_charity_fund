@@ -8,7 +8,7 @@ from app.core.db import get_async_session
 from app.core.user import current_superuser, current_user
 from app.crud import donation_crud
 from app.schemas.donation import DonationCreate, DonationDB, DonationBase
-from app.services.donation import donation_invested, donation_balance
+from app.services.donation import get_donation_balance, set_donation_invested
 from app.models import User
 
 router = APIRouter()
@@ -20,17 +20,12 @@ async def create_donation(
         session: AsyncSession = Depends(get_async_session),
         #user: User = Depends(current_user),
 ):
-    #donation_amount = await donation_balance(donation.full_amount, session)
+    donation_invested = await get_donation_balance(donation.full_amount, session)
     new_donation = await donation_crud.create(donation, session)
-    # await donation_invested(
-    #     new_donation,
-    #     donation_amount,
-    #     session)
-    # return new_donation
-
-    # new_donation = await donation_crud.create(
-    #     donation, session)  # , user)
+    if donation.full_amount != donation_invested:
+        await set_donation_invested(new_donation, donation_invested, session)
     return new_donation
+
 
 
 @router.get('/',

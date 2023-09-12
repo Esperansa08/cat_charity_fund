@@ -1,6 +1,4 @@
-from datetime import datetime
-
-from sqlalchemy import Column, Integer, DateTime, Boolean
+from sqlalchemy import Column, Integer
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import declarative_base, declared_attr, sessionmaker
 
@@ -14,11 +12,6 @@ class PreBase:
         return cls.__name__.lower()
 
     id = Column(Integer, primary_key=True)
-    create_date = Column(DateTime, default=datetime.now())
-    close_date = Column(DateTime)
-    full_amount = Column(Integer, default=False)
-    invested_amount = Column(Integer, default=0)
-    fully_invested = Column(Boolean)
 
 
 Base = declarative_base(cls=PreBase)
