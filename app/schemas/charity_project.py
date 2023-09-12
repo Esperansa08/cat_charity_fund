@@ -17,7 +17,7 @@ class CharityProjectDB(CharityProjectCreate):
     id: int
     invested_amount: int
     fully_invested: bool = Field(default=False)
-    create_date: datetime = Field(datetime.now(), example=CREATE_DATE)
+    create_date: datetime  # = Field(datetime.now, example=CREATE_DATE)
     close_date: datetime = Field(None, example=CLOSE_DATE)
 
     class Config:
@@ -27,8 +27,3 @@ class CharityProjectDB(CharityProjectCreate):
 
 class CharityProjectUpdate(CharityProjectDB):
     pass
-    # @validator('name')
-    # def name_cannot_be_null(cls, value: str):
-    #     if value is None:
-    #         raise ValueError('Имя переговорки не может быть пустым!')
-    #     return value

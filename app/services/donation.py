@@ -19,27 +19,21 @@ async def get_donation_balance(
         select(CharityProject).where(CharityProject.full_amount > CharityProject.invested_amount))
     charity_project_invested = charity_project_invested.scalars().first()
     #balance = full_amount
-    #print(charity_project_invested.name)   # , charity_donation_invested.name)
+    need_donation = 0
     if charity_project_invested is not None:
         need_donation = charity_project_invested.full_amount - charity_project_invested.invested_amount
         if full_amount > need_donation:
-            #balance = full_amount - need_donation
             close_date = datetime.now()
             setattr(charity_project_invested, 'close_date', close_date)
             setattr(charity_project_invested, 'invested_amount', charity_project_invested.full_amount)
             setattr(charity_project_invested, 'fully_invested', 1)
         else:
-            #balance = need_donation - full_amount
             charity = charity_project_invested.invested_amount + full_amount
             setattr(charity_project_invested, 'invested_amount', charity)
-    #     invested_amount = donation_invested.invested_amount - donation_invested.full_amount
-    #     charity_project_invested.invested_amount += full_amount
-    #     balance = charity_project_invested.invested_amount + full_amount
-    #     setattr(donation_invested, 'invested_amount', donation_invested.full_amount)
         session.add(charity_project_invested)
         await session.commit()
         await session.refresh(charity_project_invested)
-    return need_donation 
+    return need_donation
 
 
 async def set_donation_invested(

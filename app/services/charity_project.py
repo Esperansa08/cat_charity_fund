@@ -17,6 +17,8 @@ async def charity_project_balance(
     donation_invested = await session.execute(
         select(Donation).where(Donation.full_amount > Donation.invested_amount))
     donation_invested = donation_invested.scalars().first()
+    free_donation = 0
+    balance = 0
     if donation_invested is not None:
         free_donation = donation_invested.full_amount - donation_invested.invested_amount
         if free_donation > full_amount:
