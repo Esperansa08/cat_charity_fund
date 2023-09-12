@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-# from app.api.validators import (check_meeting_room_exists,
+from app.api.validators import (check_donation_before_edit,)
 #                                 check_reservation_intersections,
 #                                 check_reservation_before_edit)
 from app.core.db import get_async_session
@@ -14,14 +14,17 @@ from app.models import User
 router = APIRouter()
 
 
-@router.post('/', response_model=DonationCreate)
+@router.post('/',
+             response_model=DonationCreate,
+             response_model_exclude_none=True)
 async def create_donation(
         donation: DonationBase,
         session: AsyncSession = Depends(get_async_session),
-        #user: User = Depends(current_user),
+        user: User = Depends(current_user),
 ):
+    """Сделать пожертвование."""
     donation_invested = await get_donation_balance(donation.full_amount, session)
-    new_donation = await donation_crud.create(donation, session)
+    new_donation = await donation_crud.create(donation, session, user)
     if donation.full_amount != donation_invested:
         await set_donation_invested(new_donation, donation_invested, session)
     return new_donation
@@ -29,12 +32,14 @@ async def create_donation(
 
 
 @router.get('/',
-            response_model=list[DonationDB],)
-           # dependencies=[Depends(current_user)],)
-async def get_all_new_donations(
+            response_model=list[DonationDB],
+            response_model_exclude_none=True,
+            dependencies=[Depends(current_superuser)],)
+async def get_all_donations(
         session: AsyncSession = Depends(get_async_session)
 ):
-    """Только для суперюзеров."""
+    """Только для суперюзеров.
+    Возвращает список всех пожертвований."""
     donations = await donation_crud.get_multi(session)
     return donations
 
@@ -43,8 +48,9 @@ async def get_all_new_donations(
             response_model=list[DonationCreate],
             dependencies=[Depends(current_user)],)
 async def get_my_donations(
+        user: User = Depends(current_user),
         session: AsyncSession = Depends(get_async_session)
 ):
-    """Только для суперюзеров."""
-    donations = await donation_crud.get_multi(session)
+    """Вернуть список пожертвований пользователя, выполняющего запрос."""
+    donations = await donation_crud.get_donations_by_user(user, session)
     return donations
