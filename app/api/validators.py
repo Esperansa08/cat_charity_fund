@@ -4,7 +4,6 @@ from fastapi import HTTPException
 from pydantic import PositiveInt
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.user import current_superuser
 from app.crud import charity_project_crud
 from app.crud import donation_crud
 from app.models import CharityProject, Donation, User
@@ -54,39 +53,28 @@ async def check_charity_project_closed(
 async def check_charity_project_invested(
         project_id: int,
         session: AsyncSession,
-) -> CharityProject:
-    charity_project = await charity_project_crud.get_project_invested_amount(
-        project_id,
-        session)
-    if charity_project:
+) -> int:
+    project_amount = await charity_project_crud.get_project_invested_amount(
+        project_id, session)
+    if project_amount:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
             detail='В проект были внесены средства, не подлежит удалению!'
         )
-    return charity_project
+    return project_amount
 
 
 async def check_full_amount_to_update(
         project_id: int,
         full_amount_to_update: PositiveInt,
         session: AsyncSession,
-) -> CharityProject:
-    db_project_invested_amount  = await (
-        charity_project_crud.get_project_invested_amount(
-        project_id, session))
+) -> None:
+    db_project_invested_amount = await (
+        charity_project_crud.get_project_invested_amount(project_id, session))
     if db_project_invested_amount > full_amount_to_update:
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail='Нельзя установить требуемую сумму меньше уже вложенной!'
-        )
-
-
-async def check_donations_intersections(**kwargs) -> None:
-    donations = await donation_crud.get_donations_at_the_same_time(**kwargs)
-    if donations:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail=str(donations)
         )
 
 
@@ -121,17 +109,5 @@ async def check_charity_project_before_post(
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail='Проект не найден!'
-        )
-    return charity_project
-
-
-async def check_charity_project_no_desc(
-        charity_project: CharityProject,
-        session: AsyncSession,
-) -> Donation:
-    if (charity_project.name or charity_project.description) == '' or charity_project.full_amount == None:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail='Создание проектов с пустым описанием запрещено!'
         )
     return charity_project

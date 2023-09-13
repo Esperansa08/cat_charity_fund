@@ -15,8 +15,8 @@
 - [Описание](#описание)
 - [Как установить программу](#как-установить-программу)
 - [Пример запросов](#пример-запросов)
-    - [POST запрос](#post-запрос)
-    - [GET запрос](#get-запрос)
+    - [POST запрос - Создание проекта](#post-запрос---создание-проекта)
+    - [GET запрос - Получение списка пожертвований](#get-запрос---получение-списка-пожертвований)
     - [PATCH запрос](#patch-запрос)
 - [Автор](#автор)
 
@@ -80,7 +80,7 @@ pip install -r requirements.txt
 Создать в корневой директории файл .env и заполнить его:
 
 ```
-APP_TITLE=Кошачий благотворительный фонд
+APP_TITLE=Сервис для Благотворительного фонда поддержки котиков QRKot
 APP_DESCRIPTION=Сервис для поддержки котиков
 DATABASE_URL=sqlite+aiosqlite:///./fastapi.db
 SECRET=<YOUR_SECRET_WORD>
@@ -108,71 +108,97 @@ uvicorn app.main:app --reload
 
 ## Пример запросов
 
-#### POST запрос
+#### POST запрос - Создание проекта
 ```
 http://127.0.0.1:8000/charity_project/
-```
 
+```
+Request
+```
+{
+  "name": "Прививки",
+  "description": "Сбор на прививки для котят",
+  "full_amount": 20000
+}
+```
 Response
 ```
-[
 {
-"name": "string",
-"description": "string",
-"full_amount": 100,
-"id": 1,
-"invested_amount": 10,
-"fully_invested": true,
-"create_date": "2019-08-24T14:15:22Z",
-"close_date": "2019-08-24T14:15:22Z"
+  "name": "Прививки",
+  "description": "Сбор на прививки для котят",
+  "full_amount": 20000,
+  "id": 5,
+  "invested_amount": 0,
+  "fully_invested": false,
+  "create_date": "2023-09-13T15:25:01.859842"
 }
-]
 ```
-#### GET запрос
+#### GET запрос - Получение списка пожертвований
 ```
 http://127.0.0.1:8000/donation/
 
 ```
-Request
-```
-{
-"full_amount": 1000,
-"comment": "string"
-}
-```
 Response
 ```
-{
-"full_amount": 1000,
-"comment": "string",
-"id": 1,
-"create_date": "2019-08-24T14:15:22Z"
-}
+[
+  {
+    "full_amount": 500,
+    "comment": "ffds",
+    "id": 6,
+    "create_date": "2023-09-10T23:17:00.036528",
+    "user_id": 1,
+    "invested_amount": 500,
+    "fully_invested": true,
+    "close_date": "2023-09-10T23:17:05"
+  },
+  {
+    "full_amount": 2300,
+    "comment": "ex",
+    "id": 7,
+    "create_date": "2023-09-12T15:14:01.632055",
+    "user_id": 1,
+    "invested_amount": 2300,
+    "fully_invested": true,
+    "close_date": "2023-09-12T17:24:01.598221"
+  },
+  {
+    "full_amount": 3000,
+    "comment": "ex",
+    "id": 8,
+    "create_date": "2023-09-12T17:23:58.945923",
+    "user_id": 1,
+    "invested_amount": 3000,
+    "fully_invested": true,
+    "close_date": "2023-09-12T23:33:03.477603"
+  }
+]
+
+
 ```
+
 #### PATCH запрос
 ```
-http://127.0.0.1:8000/charity_project/{project_id}
+http://127.0.0.1:8000/charity_project/5
 
 ```
 Request
 ```
 {
-"name": "string",
-"description": "string",
-"full_amount": 1000
+  "name": "Прививки",
+  "description": "Сбор на прививки для котят до года",
+  "full_amount": 25000
 }
 ```
 Response
 ```
 {
-"name": "string",
-"description": "string",
-"full_amount": 1000,
-"id": 1,
-"invested_amount": 500,
-"fully_invested": true,
-"create_date": "2019-08-24T14:15:22Z",
-"close_date": "2019-08-24T14:15:22Z"
+  "name": "Прививки",
+  "description": "Сбор на прививки для котят до года",
+  "full_amount": 25000,
+  "id": 5,
+  "invested_amount": 0,
+  "fully_invested": false,
+  "create_date": "2023-09-13T15:25:01.859842"
 }
 ```
 

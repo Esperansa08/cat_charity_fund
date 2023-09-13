@@ -13,7 +13,6 @@ from app.api.validators import (check_charity_project_exists,
                                 check_name_duplicate,
                                 check_charity_project_closed,
                                 check_charity_project_invested,
-                                check_charity_project_no_desc,
                                 check_full_amount_to_update)
 
 
@@ -34,7 +33,6 @@ async def create_new_charity_project(
     await check_name_duplicate(charity_project.name, session)
     invested_amount = await charity_project_balance(
         charity_project.full_amount, session)
-    charity_project = await check_charity_project_no_desc(charity_project, session)
     new_charity_project = await charity_project_crud.create(charity_project, session)
     await charity_project_invested(new_charity_project, invested_amount,
                                    session)
@@ -70,8 +68,8 @@ async def partially_update_charity_project(
         charity_project_id, session)
     if obj_in.full_amount is not None:
         await check_full_amount_to_update(
-        charity_project_id, obj_in.full_amount, session)
-    if obj_in.name is not None:
+            charity_project_id, obj_in.full_amount, session)
+    if obj_in.name is not None and obj_in.name != charity_project.name:
         await check_name_duplicate(obj_in.name, session)
     charity_project = await charity_project_crud.update(
         charity_project, obj_in, session)

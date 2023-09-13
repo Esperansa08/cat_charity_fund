@@ -38,7 +38,7 @@ async def charity_project_balance(
     return free_donation
 
 
-async def charity_project_invested(
+async def set_full_invested(
         project_invested: CharityProject,
         balance: int,
         session: AsyncSession,
