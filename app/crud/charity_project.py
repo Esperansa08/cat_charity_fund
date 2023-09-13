@@ -46,4 +46,5 @@ class CRUDCharityProject(CRUDBase):
         )
         return project_fully_invested.scalars().first()
 
+
 charity_project_crud = CRUDCharityProject(CharityProject)

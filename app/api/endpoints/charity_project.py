@@ -5,13 +5,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db import get_async_session
 from app.core.user import current_superuser
 from app.crud import charity_project_crud
-from app.models import CharityProject
 from app.schemas.charity_project import (CharityProjectCreate,
                                          CharityProjectDB,
-                                         CharityProjectUpdate,
-                                         CharityProjectUpdateResponse)
-from app.services.charity_project import (set_full_invested,
-                                          charity_project_balance)
+                                         CharityProjectUpdate)
+from app.services.investment import (set_full_invested,
+                                     investment)
 from app.api.validators import (check_charity_project_exists,
                                 check_name_duplicate,
                                 check_charity_project_closed,
@@ -22,11 +20,10 @@ from app.api.validators import (check_charity_project_exists,
 router = APIRouter()
 
 
-@router.post(
-        '/',
-        response_model=CharityProjectDB,
-        response_model_exclude_none=True,
-        dependencies=[Depends(current_superuser)],)
+@router.post('/',
+             response_model=CharityProjectDB,
+             response_model_exclude_none=True,
+             dependencies=[Depends(current_superuser)],)
 async def create_new_charity_project(
         charity_project: CharityProjectCreate,
         session: AsyncSession = Depends(get_async_session),
@@ -34,10 +31,10 @@ async def create_new_charity_project(
     """Только для суперюзеров.
     Создаёт благотворительный проект."""
     await check_name_duplicate(charity_project.name, session)
-    invested_amount = await charity_project_balance(
-        charity_project.full_amount, session)
     new_charity_project = await charity_project_crud.create(charity_project, session)
-    await set_full_invested(new_charity_project, invested_amount, session)
+    await investment(new_charity_project, session)
+    await set_full_invested(new_charity_project)
+    await session.refresh(new_charity_project)
     return new_charity_project
 
 
@@ -53,7 +50,7 @@ async def get_all_charity_projects(
 
 
 @router.patch('/{charity_project_id}',
-              response_model=CharityProjectUpdateResponse,
+              response_model=CharityProjectDB,
               dependencies=[Depends(current_superuser)],)
 async def partially_update_charity_project(
         charity_project_id: int,
