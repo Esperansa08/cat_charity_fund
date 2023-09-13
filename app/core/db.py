@@ -26,7 +26,8 @@ class PreBaseCharityDonation(Base):
     invested_amount = Column(Integer, default=0)
     fully_invested = Column(Boolean, default=False)
     create_date = Column(DateTime, default=datetime.now)
-    close_date = Column(DateTime)
+    close_date = Column(DateTime, index=True, default=None)
+
 
 engine = create_async_engine(settings.database_url)
 

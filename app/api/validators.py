@@ -45,7 +45,7 @@ async def check_charity_project_closed(
     if charity_project.close_date is not None:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
-            detail='Проект закрыт!'
+            detail='Закрытый проект нельзя редактировать!'
         )
     return charity_project
 

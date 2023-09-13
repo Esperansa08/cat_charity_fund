@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Union
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -27,10 +28,11 @@ async def charity_project_balance(
         else:
             if donation_invested.full_amount > free_donation:
                 balance = donation_invested.full_amount
-            close_date = datetime.now()
-            setattr(donation_invested, 'close_date', close_date)
-            setattr(donation_invested, 'fully_invested', 1)
-            setattr(donation_invested, 'user_id', 1) #session.user.id)
+            set_full_invested(donation_invested, balance, session)
+            #close_date = datetime.now()
+            # setattr(donation_invested, 'close_date', close_date)
+            # setattr(donation_invested, 'fully_invested', 1)
+            # setattr(donation_invested, 'user_id', 1) #session.user.id)
         setattr(donation_invested, 'invested_amount', balance)
         session.add(donation_invested)
         await session.commit()
@@ -39,10 +41,10 @@ async def charity_project_balance(
 
 
 async def set_full_invested(
-        project_invested: CharityProject,
+        project_invested: Union[CharityProject, Donation],
         balance: int,
         session: AsyncSession,
-) -> int:
+) -> None:
     if balance >= project_invested.full_amount:
         close_date = datetime.now()
         setattr(project_invested, 'close_date', close_date)
@@ -51,7 +53,7 @@ async def set_full_invested(
     else:
         setattr(project_invested, 'fully_invested', 0)
         setattr(project_invested, 'invested_amount', balance)
-    session.add(project_invested)
-    await session.commit()
-    await session.refresh(project_invested)
-    return project_invested
+    # session.add(project_invested)
+    # await session.commit()
+    # await session.refresh(project_invested)
+    #return project_invested

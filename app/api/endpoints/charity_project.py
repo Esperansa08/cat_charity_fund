@@ -6,8 +6,11 @@ from app.core.db import get_async_session
 from app.core.user import current_superuser
 from app.crud import charity_project_crud
 from app.models import CharityProject
-from app.schemas.charity_project import CharityProjectCreate, CharityProjectDB
-from app.services.charity_project import (charity_project_invested,
+from app.schemas.charity_project import (CharityProjectCreate,
+                                         CharityProjectDB,
+                                         CharityProjectUpdate,
+                                         CharityProjectUpdateResponse)
+from app.services.charity_project import (set_full_invested,
                                           charity_project_balance)
 from app.api.validators import (check_charity_project_exists,
                                 check_name_duplicate,
@@ -34,8 +37,7 @@ async def create_new_charity_project(
     invested_amount = await charity_project_balance(
         charity_project.full_amount, session)
     new_charity_project = await charity_project_crud.create(charity_project, session)
-    await charity_project_invested(new_charity_project, invested_amount,
-                                   session)
+    await set_full_invested(new_charity_project, invested_amount, session)
     return new_charity_project
 
 
@@ -51,12 +53,11 @@ async def get_all_charity_projects(
 
 
 @router.patch('/{charity_project_id}',
-              response_model=CharityProjectDB,
-              response_model_exclude_none=True,
+              response_model=CharityProjectUpdateResponse,
               dependencies=[Depends(current_superuser)],)
 async def partially_update_charity_project(
         charity_project_id: int,
-        obj_in: CharityProjectCreate,
+        obj_in: CharityProjectUpdate,
         session: AsyncSession = Depends(get_async_session),
 ):
     """Только для суперюзеров.
@@ -79,7 +80,6 @@ async def partially_update_charity_project(
 @router.delete(
     '/{charity_project_id}',
     response_model=CharityProjectDB,
-    #response_model_exclude_none=True,
     dependencies=[Depends(current_superuser)],)
 async def remove_charity_project(
         charity_project_id: int,
@@ -90,9 +90,6 @@ async def remove_charity_project(
     инвестированы средства, его можно только закрыть."""
     charity_project = await check_charity_project_exists(
         charity_project_id, session)
-    # charity_project = await check_charity_project_closed(
-    #     charity_project_id, session)
-    #if not charity_project:
     await check_charity_project_invested(
         charity_project_id, session)
     charity_project = await charity_project_crud.remove(

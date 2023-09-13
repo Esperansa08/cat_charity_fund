@@ -1,6 +1,6 @@
 from typing import Optional
 from datetime import datetime, timedelta as td
-from pydantic import BaseModel, Field, PositiveInt, Extra  # validator,
+from pydantic import BaseModel, Field, PositiveInt, Extra
 
 
 CREATE_DATE = (datetime.now() + td(minutes=10)).isoformat(timespec='minutes')
@@ -31,3 +31,14 @@ class CharityProjectUpdate(CharityProjectCreate):
     name: Optional[str] = Field(None, min_length=1, max_length=100)
     description: Optional[str] = Field(None, min_length=1)
     full_amount: Optional[PositiveInt]
+
+
+class CharityProjectUpdateResponse(CharityProjectCreate):
+    id: int
+    invested_amount: int
+    fully_invested: bool
+    create_date: datetime
+    close_date: Optional[datetime]
+
+    class Config:
+        orm_mode = True
