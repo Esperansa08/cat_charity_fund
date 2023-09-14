@@ -3,6 +3,7 @@ from typing import Optional
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.expression import false
 
 from app.models import User
 
@@ -11,6 +12,7 @@ class CRUDBase:
 
     def __init__(self, model):
         self.model = model
+        #self.obj_in = obj_in.model
 
     async def get(
             self,
@@ -35,15 +37,17 @@ class CRUDBase:
             self,
             obj_in,
             session: AsyncSession,
-            user: Optional[User] = None
+            user: Optional[User] = None,
+            pass_commit: bool = False,
     ):
         obj_in_data = obj_in.dict()
         if user is not None:
             obj_in_data['user_id'] = user.id
         db_obj = self.model(**obj_in_data)
         session.add(db_obj)
-        await session.commit()
-        await session.refresh(db_obj)
+        if not pass_commit:
+            await session.commit()
+            await session.refresh(db_obj)
         return db_obj
 
     async def update(
@@ -71,3 +75,10 @@ class CRUDBase:
         await session.delete(db_obj)
         await session.commit()
         return db_obj
+
+    async def get_multi_ordered_by_create_date(
+            self,
+            session: AsyncSession,):
+        db_obj = await session.execute(select(self.model).where(
+            self.model.fully_invested == false()).order_by((self.model.create_date)))
+        return db_obj.scalars().all()

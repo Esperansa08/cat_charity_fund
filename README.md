@@ -103,8 +103,8 @@ uvicorn app.main:app --reload
 После запуска проект будет доступен по адресу: http://127.0.0.1:8000
 
 Документация к API досупна по адресам:
-- Swagger: http://127.0.0.1:8000/docs
-- Redoc: http://127.0.0.1:8000/redoc
+- Swagger: [Swagger](http://127.0.0.1:8000/docs)
+- Redoc: [Redoc](http://127.0.0.1:8000/redoc)
 
 ## Пример запросов
 
@@ -206,4 +206,4 @@ Response
 
 ## Автор 
 
- * Савельева Анастасия (Visteria09@yandex.ru, https://github.com/Esperansa08) 
+ * Савельева Анастасия ([Почта](Visteria09@yandex.ru), [Github](https://github.com/Esperansa08)) 

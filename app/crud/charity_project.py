@@ -34,17 +34,5 @@ class CRUDCharityProject(CRUDBase):
         )
         return project_invested_amount.scalars().first()
 
-    async def get_project_fully_invested(
-        self,
-        project_id: int,
-        session: AsyncSession,
-    ) -> bool:
-        project_fully_invested = await session.execute(
-            select(CharityProject.fully_invested).where(
-                CharityProject.id == project_id
-            )
-        )
-        return project_fully_invested.scalars().first()
-
 
 charity_project_crud = CRUDCharityProject(CharityProject)

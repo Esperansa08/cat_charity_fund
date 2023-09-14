@@ -1,11 +1,11 @@
 from http import HTTPStatus
 
 from fastapi import HTTPException
-from pydantic import PositiveInt
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud import charity_project_crud
 from app.models import CharityProject
+from app.schemas.charity_project import CharityProjectUpdate
 
 
 async def check_name_duplicate(
@@ -49,29 +49,36 @@ async def check_charity_project_closed(
     return charity_project
 
 
-async def check_charity_project_invested(
+async def check_project_invested_to_delete(
         project_id: int,
         session: AsyncSession,
 ) -> int:
-    project_amount = await charity_project_crud.get_project_invested_amount(
+    charity_project = await check_charity_project_exists(
         project_id, session)
-    if project_amount:
+    if charity_project.invested_amount:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
             detail='В проект были внесены средства, не подлежит удалению!'
         )
-    return project_amount
+    return charity_project
 
 
 async def check_full_amount_to_update(
         project_id: int,
-        full_amount_to_update: PositiveInt,
+        obj_in: CharityProjectUpdate,
         session: AsyncSession,
-) -> None:
-    db_project_invested_amount = await (
-        charity_project_crud.get_project_invested_amount(project_id, session))
-    if db_project_invested_amount > full_amount_to_update:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail='Нельзя установить требуемую сумму меньше уже вложенной!'
-        )
+) -> CharityProject:
+    charity_project = await check_charity_project_exists(
+        project_id, session)
+    await check_charity_project_closed(project_id, session)
+    if obj_in.name is not None and obj_in.name != charity_project.name:
+        await check_name_duplicate(obj_in.name, session)
+    if obj_in.full_amount is not None:
+        db_project_invested_amount = await (
+            charity_project_crud.get_project_invested_amount(project_id, session))
+        if db_project_invested_amount > obj_in.full_amount:
+            raise HTTPException(
+                status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+                detail='Нельзя установить требуемую сумму меньше уже вложенной!'
+            )
+    return charity_project

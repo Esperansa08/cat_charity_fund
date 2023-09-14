@@ -4,16 +4,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_async_session
 from app.core.user import current_superuser
-from app.crud import charity_project_crud
+from app.crud import charity_project_crud, donation_crud
 from app.schemas.charity_project import (CharityProjectCreate,
                                          CharityProjectDB,
                                          CharityProjectUpdate)
-from app.services.investment import (set_full_invested,
-                                     investment)
-from app.api.validators import (check_charity_project_exists,
-                                check_name_duplicate,
-                                check_charity_project_closed,
-                                check_charity_project_invested,
+from app.services.investment import investment
+from app.api.validators import (check_name_duplicate,
+                                check_project_invested_to_delete,
                                 check_full_amount_to_update)
 
 
@@ -25,15 +22,20 @@ router = APIRouter()
              response_model_exclude_none=True,
              dependencies=[Depends(current_superuser)],)
 async def create_new_charity_project(
-        charity_project: CharityProjectCreate,
+        project_json: CharityProjectCreate,
         session: AsyncSession = Depends(get_async_session),
 ):
     """Только для суперюзеров.
     Создаёт благотворительный проект."""
-    await check_name_duplicate(charity_project.name, session)
-    new_charity_project = await charity_project_crud.create(charity_project, session)
-    await investment(new_charity_project, session)
-    await set_full_invested(new_charity_project)
+    await check_name_duplicate(project_json.name, session)
+    new_charity_project = await charity_project_crud.create(
+        project_json, session, pass_commit=True)
+    session.add_all(
+        investment(
+            new_charity_project,
+            await donation_crud.get_multi_ordered_by_create_date(
+                session)))
+    await session.commit()
     await session.refresh(new_charity_project)
     return new_charity_project
 
@@ -60,15 +62,8 @@ async def partially_update_charity_project(
     """Только для суперюзеров.
     Закрытый проект нельзя редактировать,
     нельзя установить требуемую сумму меньше уже вложенной."""
-    charity_project = await check_charity_project_exists(
-        charity_project_id, session)
-    await check_charity_project_closed(
-        charity_project_id, session)
-    if obj_in.full_amount is not None:
-        await check_full_amount_to_update(
-            charity_project_id, obj_in.full_amount, session)
-    if obj_in.name is not None and obj_in.name != charity_project.name:
-        await check_name_duplicate(obj_in.name, session)
+    charity_project = await check_full_amount_to_update(
+        charity_project_id, obj_in, session)
     charity_project = await charity_project_crud.update(
         charity_project, obj_in, session)
     return charity_project
@@ -85,9 +80,7 @@ async def remove_charity_project(
     """Только для суперюзеров. Удаляет проект.
     Нельзя удалить проект, в который уже были
     инвестированы средства, его можно только закрыть."""
-    charity_project = await check_charity_project_exists(
-        charity_project_id, session)
-    await check_charity_project_invested(
+    charity_project = await check_project_invested_to_delete(
         charity_project_id, session)
     charity_project = await charity_project_crud.remove(
         charity_project, session)

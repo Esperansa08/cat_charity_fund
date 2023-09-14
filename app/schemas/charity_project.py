@@ -5,9 +5,12 @@ from pydantic import BaseModel, Extra, Field, PositiveInt
 
 
 class CharityProjectCreate(BaseModel):
-    name: str = Field(..., min_length=1, max_length=100)
-    description: str = Field(..., min_length=1)
+    name: str = Field(..., max_length=100)
+    description: str
     full_amount: PositiveInt
+
+    class Config:
+        min_anystr_length = 1
 
 
 class CharityProjectDB(CharityProjectCreate):
@@ -22,8 +25,8 @@ class CharityProjectDB(CharityProjectCreate):
 
 
 class CharityProjectUpdate(CharityProjectCreate):
-    name: Optional[str] = Field(None, min_length=1, max_length=100)
-    description: Optional[str] = Field(None, min_length=1)
+    name: Optional[str] = Field(None, max_length=100)
+    description: Optional[str]
     full_amount: Optional[PositiveInt]
 
     class Config:
