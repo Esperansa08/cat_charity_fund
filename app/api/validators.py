@@ -25,7 +25,8 @@ async def check_charity_project_exists(
         charity_project_id: int,
         session: AsyncSession,
 ) -> CharityProject:
-    charity_project = await charity_project_crud.get(charity_project_id, session)
+    charity_project = await charity_project_crud.get(charity_project_id,
+                                                     session)
     if charity_project is None:
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
@@ -75,7 +76,8 @@ async def check_full_amount_to_update(
         await check_name_duplicate(obj_in.name, session)
     if obj_in.full_amount is not None:
         db_project_invested_amount = await (
-            charity_project_crud.get_project_invested_amount(project_id, session))
+            charity_project_crud.get_project_invested_amount(
+                project_id, session))
         if db_project_invested_amount > obj_in.full_amount:
             raise HTTPException(
                 status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
