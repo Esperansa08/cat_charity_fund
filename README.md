@@ -18,6 +18,7 @@
     - [POST запрос - Создание проекта](#post-запрос---создание-проекта)
     - [GET запрос - Получение списка пожертвований](#get-запрос---получение-списка-пожертвований)
     - [PATCH запрос](#patch-запрос)
+    - [POST запрос - Создание гугл-таблицы](#post-запрос---создание-гугл-таблицы)
 - [Автор](#автор)
 
 
@@ -29,7 +30,7 @@ Cat Charity Fund - это API для сбора средств, разработ
 
 Пользователи могут делать ненаправленные пожертвования и сопровождать их комментарием. Пожертвования делаются в фонд, а не в конкретный проект. Каждое полученное пожертвование автоматически добавляется в первый открытый проект, который еще не набрал нужную сумму. Если пожертвование больше требуемой суммы или в фонде нет открытых проектов, оставшиеся средства будут ждать открытия следующего проекта.
 
-
+Формирует отчёт в гугл-таблице по закрытым проектам, отсортированным по скорости сбора средств — от тех, что закрылись быстрее всего, до тех, что долго собирали нужную сумму.
 
 ## Как установить программу
 
@@ -39,6 +40,7 @@ Cat Charity Fund - это API для сбора средств, разработ
 - sqlalchemy==1.4.29
 - alembic==1.7.7
 - fastapi==0.78.0
+- aiogoogle==5.5.0
 
 Клонировать репозиторий и перейти в него в командной строке:
 
@@ -82,10 +84,21 @@ pip install -r requirements.txt
 ```
 APP_TITLE=Сервис для Благотворительного фонда поддержки котиков QRKot
 APP_DESCRIPTION=Сервис для поддержки котиков
-DATABASE_URL=sqlite+aiosqlite:///./fastapi.db
+DATABASE_URL=sqlite+aiosqlite:///./catfond.db
 SECRET=<YOUR_SECRET_WORD>
 FIRST_SUPERUSER_EMAIL=<SUPERUSER_EMAIL>
 FIRST_SUPERUSER_PASSWORD=<SUPERUSER_PASSWORD>
+TYPE=<TYPE>
+PROJECT_ID=<PROJECT_ID>
+PRIVATE_KEY_ID=<PRIVATE_KEY_ID>
+PRIVATE_KEY=<PRIVATE_KEY>
+CLIENT_EMAIL=<CLIENT_EMAIL>
+CLIENT_ID=<CLIENT_ID>
+AUTH_URI=<AUTH_URI>
+TOKEN_URI=<TOKEN_URI>
+AUTH_PROVIDER_X509_CERT_URL=<AUTH_PROVIDER_X509_CERT_URL>
+CLIENT_X509_CERT_URL=<CLIENT_X509_CERT_URL>
+EMAIL=<EMAIL>
 ```
 
 Выполнить миграции:
@@ -201,7 +214,56 @@ Response
   "create_date": "2023-09-13T15:25:01.859842"
 }
 ```
+#### POST запрос - Создание гугл-таблицы
+```
+http://127.0.0.1:8000/google/
 
+```
+Response
+```
+[
+  {
+    "invested_amount": 10000,
+    "fully_invested": true,
+    "id": 2,
+    "full_amount": 10000,
+    "close_date": "2023-09-04T18:05:08",
+    "description": "Описание_2",
+    "create_date": "2023-09-01T08:05:08",
+    "name": "Вакцины"
+  },
+  {
+    "invested_amount": 8000,
+    "fully_invested": true,
+    "id": 3,
+    "full_amount": 8000,
+    "close_date": "2023-09-12T13:45:00",
+    "description": "Описание_3",
+    "create_date": "2023-09-02T22:00:00",
+    "name": "Наполнитель"
+  },
+  {
+    "invested_amount": 2000,
+    "fully_invested": true,
+    "id": 1,
+    "full_amount": 2000,
+    "close_date": "2023-09-12T10:05:08",
+    "description": "Описание_1",
+    "create_date": "2023-09-01T10:05:08",
+    "name": "На игрушки"
+  },
+  {
+    "invested_amount": 15400,
+    "fully_invested": true,
+    "id": 4,
+    "full_amount": 15400,
+    "close_date": "2023-09-18T06:25:08",
+    "description": "Описание_4",
+    "create_date": "2023-09-05T16:15:08",
+    "name": "Еда"
+  }
+]
+```
 
 
 ## Автор 
