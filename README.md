@@ -221,48 +221,7 @@ http://127.0.0.1:8000/google/
 ```
 Response
 ```
-[
-  {
-    "invested_amount": 10000,
-    "fully_invested": true,
-    "id": 2,
-    "full_amount": 10000,
-    "close_date": "2023-09-04T18:05:08",
-    "description": "Описание_2",
-    "create_date": "2023-09-01T08:05:08",
-    "name": "Вакцины"
-  },
-  {
-    "invested_amount": 8000,
-    "fully_invested": true,
-    "id": 3,
-    "full_amount": 8000,
-    "close_date": "2023-09-12T13:45:00",
-    "description": "Описание_3",
-    "create_date": "2023-09-02T22:00:00",
-    "name": "Наполнитель"
-  },
-  {
-    "invested_amount": 2000,
-    "fully_invested": true,
-    "id": 1,
-    "full_amount": 2000,
-    "close_date": "2023-09-12T10:05:08",
-    "description": "Описание_1",
-    "create_date": "2023-09-01T10:05:08",
-    "name": "На игрушки"
-  },
-  {
-    "invested_amount": 15400,
-    "fully_invested": true,
-    "id": 4,
-    "full_amount": 15400,
-    "close_date": "2023-09-18T06:25:08",
-    "description": "Описание_4",
-    "create_date": "2023-09-05T16:15:08",
-    "name": "Еда"
-  }
-]
+"https://docs.google.com/spreadsheets/d/1ZguZHRHPIsJkizSGybsP0JoBUsYPGRmHMcfLui4N7nY"
 ```
 
 

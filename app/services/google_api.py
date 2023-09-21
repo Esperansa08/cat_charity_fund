@@ -47,7 +47,7 @@ async def spreadsheets_update_value(
         spreadsheetid: str,
         charity_projects: list,
         wrapper_services: Aiogoogle
-) -> None:
+):
     now_date_time = datetime.now().strftime(FORMAT)
     service = await wrapper_services.discover('sheets', 'v4')
     table_values = [
@@ -71,3 +71,4 @@ async def spreadsheets_update_value(
             range='A1:E30',
             valueInputOption='USER_ENTERED',
             json=update_body))
+    return f'https://docs.google.com/spreadsheets/d/{spreadsheetid}'
