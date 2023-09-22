@@ -41,8 +41,7 @@ async def get_all_donations(
 ):
     """Только для суперюзеров.
     Возвращает список всех пожертвований."""
-    donations = await donation_crud.get_multi(session)
-    return donations
+    return await donation_crud.get_multi(session)
 
 
 @router.get('/my',

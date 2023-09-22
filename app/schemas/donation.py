@@ -1,10 +1,7 @@
-from datetime import datetime, timedelta as td
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel, Extra, PositiveInt
-
-CREATE_DATE = (datetime.now() + td(minutes=10)).isoformat(timespec='minutes')
-CLOSE_DATE = (datetime.now() + td(days=10)).isoformat(timespec='minutes')
 
 
 class DonationBase(BaseModel):
