@@ -16,6 +16,7 @@ from app.models.user import User
 from app.schemas.user import UserCreate
 
 MIN_LEN_PASSWORD = 3
+JWT_LIFETIME_SEC = 3600
 
 
 async def get_user_db(session: AsyncSession = Depends(get_async_session)):
@@ -26,7 +27,7 @@ bearer_transport = BearerTransport(tokenUrl='auth/jwt/login')
 
 
 def get_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=settings.secret, lifetime_seconds=3600)
+    return JWTStrategy(secret=settings.secret, lifetime_seconds=JWT_LIFETIME_SEC)
 
 
 auth_backend = AuthenticationBackend(
